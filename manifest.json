@@ -1,0 +1,17 @@
+{
+  "id": "/spiderman1/",
+  "name": "Rishi Music",
+  "short_name": "Rishi Music",
+  "description": "Personal Audio Station",
+  "start_url": "/spiderman1/",
+  "scope": "/spiderman1/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0b0b0f",
+  "theme_color": "#0b0b0f",
+  "categories": [
+    "music",
+    "entertainment"
+  ],
+  "prefer_related_applications": false
+}

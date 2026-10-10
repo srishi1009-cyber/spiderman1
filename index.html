@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, viewport-fit=cover"
+  >
+
+  <meta name="theme-color" content="#070912">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta
+    name="apple-mobile-web-app-status-bar-style"
+    content="black-translucent"
+  >
+
+  <meta
+    name="description"
+    content="Rishi Music - Your personal offline music player."
+  >
+
+  <title>Rishi Music</title>
+
+  <!-- Progressive Web App manifest -->
+  <link rel="manifest" href="./manifest.json">
+
+  <!-- Application icons -->
+  <link
+    rel="icon"
+    type="image/png"
+    sizes="192x192"
+    href="./icons/icon-192.png"
+  >
+
+  <link
+    rel="apple-touch-icon"
+    href="./icons/icon-192.png"
+  >
+
+  <!-- Main stylesheet -->
+  <link rel="stylesheet" href="./style.css">
+</head>
+
+<body class="is-idle is-paused">
+
+  <!-- ==================== HEADER ==================== -->
+
+  <header class="top">
+
+    <h1 class="logo">&#9835; RISHI MUSIC</h1>
+
+    <p class="tagline">Personal Audio Station</p>
+
+    <button
+      id="importBtn"
+      class="btn-import"
+      type="button"
+    >
+      + Import Track
+    </button>
+
+    <!-- Backup, restore and sync -->
+
+    <div class="backup-row">
+
+      <button
+        id="backupBtn"
+        class="btn-ghost"
+        type="button"
+      >
+        &#11015; Backup
+      </button>
+
+      <button
+        id="restoreBtn"
+        class="btn-ghost"
+        type="button"
+      >
+        &#11014; Restore
+      </button>
+
+      <button
+        id="syncBtn"
+        class="btn-ghost"
+        type="button"
+      >
+        &#8635; Sync
+      </button>
+
+      <input
+        id="restoreInput"
+        type="file"
+        hidden
+      >
+
+    </div>
+
+    <!-- Director selection -->
+
+    <label
+      class="field-label"
+      for="directorSelect"
+    >
+      Playlist / Artist
+    </label>
+
+    <div class="select-wrap">
+
+      <select id="directorSelect">
+
+        <option value="__all">
+          ALL DIRECTORS
+        </option>
+
+      </select>
+
+    </div>
+
+  </header>
+
+  <!-- ==================== SONG LIBRARY ==================== -->
+
+  <main>
+
+    <div class="list-head">
+
+      <h2 id="listTitle">
+        All Songs
+      </h2>
+
+      <input
+        id="searchInput"
+        type="search"
+        placeholder="Search song name..."
+        autocomplete="off"
+        aria-label="Search songs"
+      >
+
+    </div>
+
+    <!-- Library actions -->
+
+    <div class="list-actions">
+
+      <button
+        id="playAllBtn"
+        class="btn-shuffle"
+        type="button"
+      >
+        &#128256; Shuffle play
+      </button>
+
+      <button
+        id="resetBtn"
+        class="btn-ghost"
+        type="button"
+        hidden
+      >
+        &#8634; Reset today
+      </button>
+
+    </div>
+
+    <p
+      id="countLabel"
+      class="count"
+      aria-live="polite"
+    ></p>
+
+    <!-- JavaScript renders songs here -->
+
+    <ul
+      id="songList"
+      class="song-list"
+    ></ul>
+
+    <p
+      id="emptyMsg"
+      class="empty"
+      hidden
+    >
+      No songs yet. Tap
+      <b>+ Import Track</b>
+      to add your downloaded songs.
+    </p>
+
+  </main>
+
+  <!-- ==================== MUSIC PLAYER ==================== -->
+
+  <footer class="player">
+
+    <div class="now">
+
+      <div class="disc">
+        <span>&#9835;</span>
+      </div>
+
+      <div class="now-text">
+
+        <div
+          id="nowTitle"
+          class="now-title"
+          aria-live="polite"
+        >
+          No track playing
+        </div>
+
+        <div
+          id="nowSub"
+          class="now-sub"
+        >
+          Select a song from your library
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- Playback progress -->
+
+    <div class="seek-row">
+
+      <span id="curTime">0:00</span>
+
+      <input
+        id="seek"
+        type="range"
+        min="0"
+        max="100"
+        value="0"
+        step="0.1"
+        aria-label="Song progress"
+      >
+
+      <span id="durTime">0:00</span>
+
+    </div>
+
+    <!-- Playback controls -->
+
+    <div class="controls">
+
+      <button
+        id="prevBtn"
+        class="ctl small"
+        type="button"
+        aria-label="Previous song"
+      >
+        &#9198;&#xFE0E;
+      </button>
+
+      <button
+        id="playBtn"
+        class="ctl big"
+        type="button"
+        aria-label="Play or pause"
+      >
+        &#9654;
+      </button>
+
+      <button
+        id="nextBtn"
+        class="ctl small"
+        type="button"
+        aria-label="Next song"
+      >
+        &#9197;&#xFE0E;
+      </button>
+
+    </div>
+
+  </footer>
+
+  <!-- ==================== IMPORT DIALOG ==================== -->
+
+  <div
+    id="importModal"
+    class="modal"
+    hidden
+  >
+
+    <div
+      class="modal-card"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="importHeading"
+    >
+
+      <h3 id="importHeading">
+        Import tracks
+      </h3>
+
+      <label for="importDirector">
+        Music director (optional)
+      </label>
+
+      <input
+        id="importDirector"
+        list="directorList"
+        placeholder="e.g. Anirudh, A. R. Rahman"
+        autocomplete="off"
+      >
+
+      <datalist id="directorList"></datalist>
+
+      <p class="hint">
+        This director is applied to every song you pick now.
+        You can change it later with Edit.
+      </p>
+
+      <input
+        id="fileInput"
+        type="file"
+        accept="audio/*,.mp3,.m4a,.aac,.wav,.ogg,.flac,.opus"
+        multiple
+        hidden
+      >
+
+      <p
+        id="importStatus"
+        class="status"
+        hidden
+        aria-live="polite"
+      ></p>
+
+      <div class="modal-actions">
+
+        <button
+          id="importCancel"
+          class="btn-ghost"
+          type="button"
+        >
+          Cancel
+        </button>
+
+        <button
+          id="importChoose"
+          class="btn-primary"
+          type="button"
+        >
+          Choose songs
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- ==================== EDIT SONG DIALOG ==================== -->
+
+  <div
+    id="editModal"
+    class="modal"
+    hidden
+  >
+
+    <div
+      class="modal-card"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="editHeading"
+    >
+
+      <h3 id="editHeading">
+        Edit song
+      </h3>
+
+      <label for="editTitle">
+        Song name
+      </label>
+
+      <input
+        id="editTitle"
+        autocomplete="off"
+      >
+
+      <label for="editDirector">
+        Music director
+      </label>
+
+      <input
+        id="editDirector"
+        list="directorList"
+        autocomplete="off"
+      >
+
+      <div class="modal-actions">
+
+        <button
+          id="editCancel"
+          class="btn-ghost"
+          type="button"
+        >
+          Cancel
+        </button>
+
+        <button
+          id="editSave"
+          class="btn-primary"
+          type="button"
+        >
+          Save changes
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- ==================== NOTIFICATIONS ==================== -->
+
+  <div
+    id="toast"
+    class="toast"
+    role="status"
+    aria-live="polite"
+    hidden
+  ></div>
+
+  <!-- ==================== APPLICATION SCRIPT ==================== -->
+
+  <script src="./app.js"></script>
+
+  <!-- ==================== SERVICE WORKER ==================== -->
+
+  <script>
+    if ("serviceWorker" in navigator) {
+
+      window.addEventListener("load", function () {
+
+        navigator.serviceWorker
+          .register("./sw.js")
+          .then(function (registration) {
+
+            console.log(
+              "Rishi Music service worker registered:",
+              registration.scope
+            );
+
+          })
+          .catch(function (error) {
+
+            console.error(
+              "Rishi Music service worker registration failed:",
+              error
+            );
+
+          });
+
+      });
+
+    }
+  </script>
+
+</body>
+</html>
